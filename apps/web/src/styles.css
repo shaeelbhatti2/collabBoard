@@ -1,0 +1,41 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0f1117;
+  color: #e8eaed;
+}
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #2a2f3a;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.version {
+  font-size: 12px;
+  color: #9aa0a6;
+}
+
+.stage {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  color: #9aa0a6;
+}
