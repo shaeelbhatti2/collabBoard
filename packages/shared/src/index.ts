@@ -1,13 +1,2 @@
-export const VERSION = "0.1.0";
-
-export type Result<T> =
-  | { ok: true; value: T }
-  | { ok: false; error: string };
-
-export function ok<T>(value: T): Result<T> {
-  return { ok: true, value };
-}
-
-export function err<T>(error: string): Result<T> {
-  return { ok: false, error };
-}
+export * from "./domain.js";
+export * from "./result.js";
