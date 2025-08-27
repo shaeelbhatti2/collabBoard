@@ -1,31 +1,30 @@
 import "dotenv/config";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { VERSION } from "@collabboard/shared";
-
-const port = Number(process.env.PORT ?? 4000);
-const host = process.env.HOST ?? "0.0.0.0";
+import { loadConfig } from "./config.js";
+import { createStartupLogger, wrapFastifyLogger } from "./logger.js";
+import { buildApp } from "./app.js";
 
 async function main() {
-  const app = Fastify({ logger: true });
+  const config = loadConfig();
+  const startupLog = createStartupLogger();
+
+  const app = Fastify({
+    logger: {
+      level: config.nodeEnv === "production" ? "info" : "debug",
+    },
+  });
 
   await app.register(cors, {
-    origin: process.env.CORS_ORIGIN ?? true,
+    origin: config.corsOrigin,
     credentials: true,
   });
 
-  app.get("/health", async () => ({
-    status: "ok",
-    version: VERSION,
-    uptime: process.uptime(),
-  }));
+  const log = wrapFastifyLogger(app.log);
+  await buildApp(app, { config, log });
 
-  app.get("/", async () => ({
-    name: "collabboard-api",
-    version: VERSION,
-  }));
-
-  await app.listen({ port, host });
+  await app.listen({ port: config.port, host: config.host });
+  startupLog.info("server listening", { port: config.port, host: config.host });
 }
 
 main().catch((error) => {
