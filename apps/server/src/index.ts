@@ -4,6 +4,8 @@ import cors from "@fastify/cors";
 import { loadConfig } from "./config.js";
 import { createPool } from "./db/pool.js";
 import { createStartupLogger, wrapFastifyLogger } from "./logger.js";
+import { createRedisClient } from "./redis/client.js";
+import { BoardRoomStore } from "./ws/rooms.js";
 import { buildApp } from "./app.js";
 
 async function main() {
@@ -22,8 +24,10 @@ async function main() {
   });
 
   const db = createPool(config);
+  const redis = createRedisClient(config);
+  const rooms = new BoardRoomStore();
   const log = wrapFastifyLogger(app.log);
-  await buildApp(app, { config, log, db });
+  await buildApp(app, { config, log, db, redis, rooms });
 
   await app.listen({ port: config.port, host: config.host });
   startupLog.info("server listening", { port: config.port, host: config.host });

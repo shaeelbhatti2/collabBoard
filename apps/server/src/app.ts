@@ -1,14 +1,19 @@
 import type { FastifyInstance } from "fastify";
 import type { AppConfig } from "../config.js";
 import type { DbPool } from "../db/pool.js";
+import type { RedisClient } from "../redis/client.js";
 import type { Logger } from "../logger.js";
 import { registerAuthRoutes } from "./auth.js";
 import { registerHealthRoutes } from "./health.js";
+import { registerWebSocketGateway } from "../ws/gateway.js";
+import type { BoardRoomStore } from "../ws/rooms.js";
 
 export interface AppContext {
   config: AppConfig;
   log: Logger;
   db: DbPool;
+  redis: RedisClient;
+  rooms: BoardRoomStore;
 }
 
 export async function buildApp(app: FastifyInstance, ctx: AppContext): Promise<void> {
@@ -26,6 +31,7 @@ export async function buildApp(app: FastifyInstance, ctx: AppContext): Promise<v
 
   await registerHealthRoutes(app);
   await registerAuthRoutes(app, ctx.db);
+  await registerWebSocketGateway(app, ctx.redis, ctx.rooms);
 }
 
 declare module "fastify" {
