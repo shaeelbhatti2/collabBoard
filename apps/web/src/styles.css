@@ -33,9 +33,22 @@ body {
   color: #9aa0a6;
 }
 
-.stage {
+.board-title {
+  font-size: 14px;
+  color: #c4c7cc;
+}
+
+.canvas-shell {
   flex: 1;
-  display: grid;
-  place-items: center;
-  color: #9aa0a6;
+  overflow: hidden;
+}
+
+.canvas-stage {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+
+.canvas-stage:active {
+  cursor: grabbing;
 }
