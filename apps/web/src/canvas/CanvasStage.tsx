@@ -1,6 +1,12 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useViewportStore, useToolStore } from "../store/canvas-store";
 import { useShapeStore, drawShape, screenToWorld } from "./shape-layer";
+import {
+  useSelectionStore,
+  hitTestShape,
+  selectionBounds,
+  drawSelectionOverlay,
+} from "./selection-layer";
 
 interface CanvasStageProps {
   width: number;
@@ -15,6 +21,9 @@ export function CanvasStage({ width, height }: CanvasStageProps) {
   const mode = useToolStore((s) => s.mode);
   const shapes = useShapeStore((s) => s.shapes);
   const createShapeAt = useShapeStore((s) => s.createShapeAt);
+  const selectedIds = useSelectionStore((s) => s.selectedIds);
+  const selectOne = useSelectionStore((s) => s.selectOne);
+  const clearSelection = useSelectionStore((s) => s.clear);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -59,8 +68,13 @@ export function CanvasStage({ width, height }: CanvasStageProps) {
       drawShape(ctx, shape);
     }
 
+    const bounds = selectionBounds(shapes, selectedIds);
+    if (bounds) {
+      drawSelectionOverlay(ctx, bounds, viewport.zoom);
+    }
+
     ctx.restore();
-  }, [height, shapes, viewport.x, viewport.y, viewport.zoom, width]);
+  }, [height, selectedIds, shapes, viewport.x, viewport.y, viewport.zoom, width]);
 
   useEffect(() => {
     let frame = 0;
@@ -90,7 +104,21 @@ export function CanvasStage({ width, height }: CanvasStageProps) {
       return;
     }
 
-    if (mode !== "select" && mode !== "pan") {
+    if (mode === "select") {
+      const world = screenToWorld(event.clientX - rect.left, event.clientY - rect.top, viewport);
+      const hit = hitTestShape(shapes, world.x, world.y);
+      if (hit) {
+        selectOne(hit.id);
+      } else {
+        clearSelection();
+      }
+      dragging.current = true;
+      lastPoint.current = { x: event.clientX, y: event.clientY };
+      event.currentTarget.setPointerCapture(event.pointerId);
+      return;
+    }
+
+    if (mode !== "pan") {
       const world = screenToWorld(event.clientX - rect.left, event.clientY - rect.top, viewport);
       const toolType = mode === "arrow" ? "line" : mode;
       if (toolType === "rect" || toolType === "ellipse" || toolType === "text" || toolType === "sticky" || toolType === "line") {
