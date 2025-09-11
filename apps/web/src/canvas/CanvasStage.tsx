@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
-import { useViewportStore } from "../store/canvas-store";
+import { useViewportStore, useToolStore } from "../store/canvas-store";
+import { useShapeStore, drawShape, screenToWorld } from "./shape-layer";
 
 interface CanvasStageProps {
   width: number;
@@ -11,6 +12,9 @@ export function CanvasStage({ width, height }: CanvasStageProps) {
   const dragging = useRef(false);
   const lastPoint = useRef({ x: 0, y: 0 });
   const viewport = useViewportStore();
+  const mode = useToolStore((s) => s.mode);
+  const shapes = useShapeStore((s) => s.shapes);
+  const createShapeAt = useShapeStore((s) => s.createShapeAt);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -51,8 +55,12 @@ export function CanvasStage({ width, height }: CanvasStageProps) {
       ctx.stroke();
     }
 
+    for (const shape of shapes) {
+      drawShape(ctx, shape);
+    }
+
     ctx.restore();
-  }, [height, viewport.x, viewport.y, viewport.zoom, width]);
+  }, [height, shapes, viewport.x, viewport.y, viewport.zoom, width]);
 
   useEffect(() => {
     let frame = 0;
@@ -77,6 +85,20 @@ export function CanvasStage({ width, height }: CanvasStageProps) {
   };
 
   const onPointerDown = (event: React.PointerEvent) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
+
+    if (mode !== "select" && mode !== "pan") {
+      const world = screenToWorld(event.clientX - rect.left, event.clientY - rect.top, viewport);
+      const toolType = mode === "arrow" ? "line" : mode;
+      if (toolType === "rect" || toolType === "ellipse" || toolType === "text" || toolType === "sticky" || toolType === "line") {
+        createShapeAt(toolType, world.x, world.y);
+      }
+      return;
+    }
+
     dragging.current = true;
     lastPoint.current = { x: event.clientX, y: event.clientY };
     event.currentTarget.setPointerCapture(event.pointerId);
