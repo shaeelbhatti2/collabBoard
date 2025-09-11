@@ -40,7 +40,33 @@ body {
 
 .canvas-shell {
   flex: 1;
+  display: flex;
   overflow: hidden;
+}
+
+.toolbar {
+  width: 72px;
+  border-right: 1px solid #2a2f3a;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 8px;
+  background: #0f1117;
+}
+
+.tool {
+  border: 1px solid #2a2f3a;
+  background: #171a22;
+  color: #e8eaed;
+  border-radius: 6px;
+  padding: 8px 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.tool.active {
+  border-color: #3b82f6;
+  background: #1e293b;
 }
 
 .canvas-stage {
