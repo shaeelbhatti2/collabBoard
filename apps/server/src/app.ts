@@ -6,8 +6,10 @@ import type { Logger } from "../logger.js";
 import { registerAuthRoutes } from "./auth.js";
 import { registerBoardRoutes } from "./boards.js";
 import { registerHealthRoutes } from "./health.js";
+import { registerPresenceRoutes } from "./presence.js";
 import { registerWebSocketGateway } from "../ws/gateway.js";
 import type { BoardRoomStore } from "../ws/rooms.js";
+import type { PresenceRegistry } from "../presence/registry.js";
 
 export interface AppContext {
   config: AppConfig;
@@ -15,6 +17,7 @@ export interface AppContext {
   db: DbPool;
   redis: RedisClient;
   rooms: BoardRoomStore;
+  presence: PresenceRegistry;
 }
 
 export async function buildApp(app: FastifyInstance, ctx: AppContext): Promise<void> {
@@ -33,6 +36,7 @@ export async function buildApp(app: FastifyInstance, ctx: AppContext): Promise<v
   await registerHealthRoutes(app);
   await registerAuthRoutes(app, ctx.db);
   await registerBoardRoutes(app, ctx.db);
+  await registerPresenceRoutes(app, ctx.presence);
   await registerWebSocketGateway(app, ctx.redis, ctx.rooms);
 }
 
