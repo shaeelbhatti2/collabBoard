@@ -8,6 +8,7 @@ import { registerBoardRoutes } from "./boards.js";
 import { registerCommentRoutes } from "./comments.js";
 import { registerHealthRoutes } from "./health.js";
 import { registerPresenceRoutes } from "./presence.js";
+import { registerSnapshotRoutes } from "./snapshots.js";
 import { registerWebSocketGateway } from "../ws/gateway.js";
 import type { BoardRoomStore } from "../ws/rooms.js";
 import type { PresenceRegistry } from "../presence/registry.js";
@@ -38,6 +39,7 @@ export async function buildApp(app: FastifyInstance, ctx: AppContext): Promise<v
   await registerAuthRoutes(app, ctx.db);
   await registerBoardRoutes(app, ctx.db);
   await registerCommentRoutes(app, ctx.db);
+  await registerSnapshotRoutes(app, ctx.db);
   await registerPresenceRoutes(app, ctx.presence);
   await registerWebSocketGateway(app, ctx.redis, ctx.rooms);
 }
