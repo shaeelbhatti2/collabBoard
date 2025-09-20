@@ -64,9 +64,25 @@ body {
   cursor: pointer;
 }
 
-.tool.active {
-  border-color: #3b82f6;
-  background: #1e293b;
+.export-menu {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.export-menu button,
+.theme-toggle {
+  border: 1px solid #2a2f3a;
+  background: #171a22;
+  color: #e8eaed;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.export-hidden {
+  display: none;
 }
 
 .canvas-stage {

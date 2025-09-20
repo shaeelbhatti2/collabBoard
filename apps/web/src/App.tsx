@@ -1,5 +1,6 @@
 import { VERSION } from "@collabboard/shared";
 import { CanvasShell } from "./canvas/CanvasShell";
+import { ExportMenu } from "./canvas/ExportMenu";
 import { useBoardStore } from "./store/canvas-store";
 
 export function App() {
@@ -10,6 +11,7 @@ export function App() {
       <header className="topbar">
         <h1>CollabBoard</h1>
         <span className="board-title">{boardTitle}</span>
+        <ExportMenu />
         <span className="version">v{VERSION}</span>
       </header>
       <CanvasShell />
